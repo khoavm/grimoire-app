@@ -12,20 +12,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22.17.1'
-          cache: 'npm'
+      - name: Build Docker Image (The Factory)
+        run: docker build -t grimoire-build-image .
 
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build
-        run: npm run build
-
-      - name: Deploy
+      - name: Extract Build Artifacts (Lấy file đã build ra VM)
         run: |
-          # Xóa code cũ và copy code mới vào thư mục Nginx
-          rm -rf /var/www/grimoire/*
-          cp -R dist/* /var/www/grimoire/
+          # 1. Tạo một container tạm thời từ image vừa build
+          docker create --name tmp-grimoire grimoire-build-image
+          
+          # 2. Copy thư mục dist từ trong container ra thư mục của Nginx trên VM
+          # Giả sử bạn để web tại /var/www/grimoire
+          sudo rm -rf /var/www/grimoire/*
+          docker cp tmp-grimoire:/app/dist/. /var/www/grimoire/
+          
+          # 3. Xóa container tạm và image để dọn dẹp bộ nhớ
+          docker rm tmp-grimoire
+          docker rmi grimoire-build-image
