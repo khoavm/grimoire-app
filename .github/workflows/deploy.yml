@@ -1,0 +1,31 @@
+name: CI/CD Grimoire App
+
+on:
+  push:
+    branches: [ "main" ] # Hoặc "master" tùy nhánh chính của bạn
+
+jobs:
+  build-and-deploy:
+    runs-on: [self-hosted, linux, arm64]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy
+        run: |
+          # Xóa code cũ và copy code mới vào thư mục Nginx
+          rm -rf /var/www/grimoire/*
+          cp -R dist/* /var/www/grimoire/
