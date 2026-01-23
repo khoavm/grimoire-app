@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import QuestBoard from "@/components/pages/QuestBoard.tsx";
 const App: React.FC = () => {
     const [isExpand, setIsExpand] = useState(false)
+
     return (
         <div className="flex items-start w-full bg-slate-50/50">
             {/* SIDEBAR */}

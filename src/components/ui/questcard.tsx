@@ -1,13 +1,14 @@
 import React from 'react';
+import  {QuestDTOActionTypeEnum, QuestDTOTypeEnum} from "@/api/grimoire_svc";
 
 // Định nghĩa kiểu dữ liệu cho Props
 interface QuestCardProps {
-    type: string;
+    type: QuestDTOTypeEnum;
     title: string;
     description: string;
     reward: string;
     onClick?: () => void; // Dấu '?' nghĩa là prop này không bắt buộc
-    actionType: 'input_text' | 'check_in' | 'link';
+    actionType: QuestDTOActionTypeEnum;
 }
 
 const QuestCard: React.FC<QuestCardProps> = ({
@@ -19,14 +20,14 @@ const QuestCard: React.FC<QuestCardProps> = ({
                                              }) => {
 
     // Hàm helper định kiểu trả về là string
-    const getTypeStyle = (typeStr: string): string => {
-        switch (typeStr.toLowerCase()) {
-            case 'kiến thức':
+    const getTypeStyle = (typeStr: QuestDTOTypeEnum): string => {
+        switch (typeStr) {
+            case QuestDTOTypeEnum.Knowledge:
                 return 'bg-blue-50 text-blue-700 border-blue-200';
-            case 'sự kiện':
-                return 'bg-purple-50 text-purple-700 border-purple-200';
-            case 'chính tuyến':
-                return 'bg-orange-50 text-orange-700 border-orange-200';
+            // case 'sự kiện':
+            //     return 'bg-purple-50 text-purple-700 border-purple-200';
+            // case 'chính tuyến':
+            //     return 'bg-orange-50 text-orange-700 border-orange-200';
             default:
                 return 'bg-gray-100 text-gray-700 border-gray-200';
         }
