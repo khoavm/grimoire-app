@@ -1,0 +1,16 @@
+.gitignore
+.npmignore
+api.ts
+base.ts
+common.ts
+configuration.ts
+docs/AnswerQuestRequest.md
+docs/ApiResponseBodyDataListQuestDTO.md
+docs/ApiResponseBodyGradingResult.md
+docs/DataListQuestDTO.md
+docs/GetQuestListRequest.md
+docs/GradingResult.md
+docs/QuestControllerApi.md
+docs/QuestDTO.md
+git_push.sh
+index.ts
