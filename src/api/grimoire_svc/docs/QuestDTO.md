@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **type** | **string** |  | [optional] [default to undefined]
 **actionType** | **string** |  | [optional] [default to undefined]
 **answerHint** | **string** |  | [optional] [default to undefined]
+**reward** | [**RewardDto**](RewardDto.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -24,6 +25,7 @@ const instance: QuestDTO = {
     type,
     actionType,
     answerHint,
+    reward,
 };
 ```
 

@@ -7,10 +7,15 @@ configuration.ts
 docs/AnswerQuestRequest.md
 docs/ApiResponseBodyDataListQuestDTO.md
 docs/ApiResponseBodyGradingResult.md
+docs/ApiResponseBodyListQuestDTO.md
+docs/ApiResponseBodyQuestDTO.md
+docs/CreateQuestRequest.md
 docs/DataListQuestDTO.md
 docs/GetQuestListRequest.md
 docs/GradingResult.md
 docs/QuestControllerApi.md
 docs/QuestDTO.md
+docs/RewardDto.md
+docs/SuggestQuestRequest.md
 git_push.sh
 index.ts

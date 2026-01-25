@@ -2,7 +2,7 @@ name: CI/CD Grimoire App
 
 on:
   push:
-    branches: [ "main" ] # Hoặc "master" tùy nhánh chính của bạn
+    branches: ['main'] # Hoặc "master" tùy nhánh chính của bạn
 
 jobs:
   build-and-deploy:
@@ -19,12 +19,12 @@ jobs:
         run: |
           # 1. Tạo một container tạm thời từ image vừa build
           docker create --name tmp-grimoire grimoire-build-image
-          
+
           # 2. Copy thư mục dist từ trong container ra thư mục của Nginx trên VM
           # Giả sử bạn để web tại /var/www/grimoire
           sudo rm -rf /var/www/grimoire/*
           docker cp tmp-grimoire:/app/dist/. /var/www/grimoire/
-          
+
           # 3. Xóa container tạm và image để dọn dẹp bộ nhớ
           docker rm tmp-grimoire
           docker rmi grimoire-build-image

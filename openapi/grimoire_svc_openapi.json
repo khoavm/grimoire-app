@@ -1,1 +1,280 @@
-{"openapi":"3.0.1","info":{"title":"OpenAPI definition","version":"v0"},"servers":[{"url":"http://localhost:8080","description":"Generated server url"}],"paths":{"/api/v1/quest/{questId}/answer":{"post":{"tags":["Quest Controller"],"summary":"Answer Quest","operationId":"answerQuest","parameters":[{"name":"questId","in":"path","required":true,"schema":{"type":"string","format":"uuid"}}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/AnswerQuestRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseBodyGradingResult"}}}}}}},"/api/v1/quest/list":{"post":{"tags":["Quest Controller"],"summary":"Get Quest List","operationId":"getQuestList","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/GetQuestListRequest"}}},"required":true},"responses":{"200":{"description":"OK","content":{"*/*":{"schema":{"$ref":"#/components/schemas/ApiResponseBodyDataListQuestDTO"}}}}}}}},"components":{"schemas":{"AnswerQuestRequest":{"type":"object","properties":{"questionDescription":{"type":"string"},"answer":{"type":"string"}}},"ApiResponseBodyGradingResult":{"type":"object","properties":{"data":{"$ref":"#/components/schemas/GradingResult"},"message":{"type":"string"},"statusCode":{"type":"integer","format":"int32"}}},"GradingResult":{"type":"object","properties":{"isCorrect":{"type":"boolean"},"score":{"type":"integer","format":"int32"},"feedback":{"type":"string"},"improvementHint":{"type":"string"}}},"GetQuestListRequest":{"type":"object","properties":{"query":{"type":"string"},"type":{"type":"string"},"page":{"type":"integer","format":"int32"},"size":{"type":"integer","format":"int32"}}},"ApiResponseBodyDataListQuestDTO":{"type":"object","properties":{"data":{"$ref":"#/components/schemas/DataListQuestDTO"},"message":{"type":"string"},"statusCode":{"type":"integer","format":"int32"}}},"DataListQuestDTO":{"type":"object","properties":{"total":{"type":"integer","format":"int64"},"data":{"type":"array","items":{"$ref":"#/components/schemas/QuestDTO"}},"page":{"type":"integer","format":"int32"},"size":{"type":"integer","format":"int32"}}},"QuestDTO":{"type":"object","properties":{"id":{"type":"string","format":"uuid"},"title":{"type":"string"},"description":{"type":"string"},"type":{"type":"string","enum":["KNOWLEDGE"]},"actionType":{"type":"string","enum":["input_text"]},"answerHint":{"type":"string"}}}}}}
+{
+  "openapi": "3.0.1",
+  "info": { "title": "OpenAPI definition", "version": "v0" },
+  "servers": [
+    { "url": "http://localhost:8080", "description": "Generated server url" }
+  ],
+  "paths": {
+    "/api/v1/quest": {
+      "post": {
+        "tags": ["Quest Controller"],
+        "summary": "Create Quest",
+        "operationId": "createQuest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateQuestRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyQuestDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quest/{questId}/answer": {
+      "post": {
+        "tags": ["Quest Controller"],
+        "summary": "Answer Quest",
+        "operationId": "answerQuest",
+        "parameters": [
+          {
+            "name": "questId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AnswerQuestRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyGradingResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quest/suggest": {
+      "post": {
+        "tags": ["Quest Controller"],
+        "summary": "Suggest Quests",
+        "operationId": "suggestQuest",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SuggestQuestRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyListQuestDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quest/list": {
+      "post": {
+        "tags": ["Quest Controller"],
+        "summary": "Get Quest List",
+        "operationId": "getQuestList",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/GetQuestListRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyDataListQuestDTO"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/quest/{questId}": {
+      "delete": {
+        "tags": ["Quest Controller"],
+        "summary": "Delete Quest",
+        "operationId": "deleteQuest",
+        "parameters": [
+          {
+            "name": "questId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "format": "uuid" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyGradingResult"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateQuestRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "type": { "type": "string" },
+          "actionType": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "input_text",
+              "quiz",
+              "file_submission",
+              "voice_record"
+            ]
+          },
+          "answerHint": { "type": "string" },
+          "reward": { "$ref": "#/components/schemas/RewardDto" }
+        }
+      },
+      "RewardDto": {
+        "type": "object",
+        "properties": {
+          "gold": { "type": "integer", "format": "int32" },
+          "exp": { "type": "integer", "format": "int32" }
+        }
+      },
+      "ApiResponseBodyQuestDTO": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/QuestDTO" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer", "format": "int32" }
+        }
+      },
+      "QuestDTO": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "title": { "type": "string" },
+          "description": { "type": "string" },
+          "type": { "type": "string" },
+          "actionType": {
+            "type": "string",
+            "enum": [
+              "unknown",
+              "input_text",
+              "quiz",
+              "file_submission",
+              "voice_record"
+            ]
+          },
+          "answerHint": { "type": "string" },
+          "reward": { "$ref": "#/components/schemas/RewardDto" }
+        }
+      },
+      "AnswerQuestRequest": {
+        "type": "object",
+        "properties": {
+          "questionDescription": { "type": "string" },
+          "answer": { "type": "string" }
+        }
+      },
+      "ApiResponseBodyGradingResult": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/GradingResult" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer", "format": "int32" }
+        }
+      },
+      "GradingResult": {
+        "type": "object",
+        "properties": {
+          "isCorrect": { "type": "boolean" },
+          "score": { "type": "integer", "format": "int32" },
+          "feedback": { "type": "string" },
+          "improvementHint": { "type": "string" }
+        }
+      },
+      "SuggestQuestRequest": {
+        "type": "object",
+        "properties": { "prompt": { "type": "string" } }
+      },
+      "ApiResponseBodyListQuestDTO": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/QuestDTO" }
+          },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer", "format": "int32" }
+        }
+      },
+      "GetQuestListRequest": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string" },
+          "type": { "type": "string" },
+          "page": { "type": "integer", "format": "int32" },
+          "size": { "type": "integer", "format": "int32" }
+        }
+      },
+      "ApiResponseBodyDataListQuestDTO": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/DataListQuestDTO" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer", "format": "int32" }
+        }
+      },
+      "DataListQuestDTO": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer", "format": "int64" },
+          "data": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/QuestDTO" }
+          },
+          "page": { "type": "integer", "format": "int32" },
+          "size": { "type": "integer", "format": "int32" }
+        }
+      }
+    }
+  }
+}

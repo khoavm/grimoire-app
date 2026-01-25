@@ -37,6 +37,35 @@ export interface ApiResponseBodyGradingResult {
     'message'?: string;
     'statusCode'?: number;
 }
+export interface ApiResponseBodyListQuestDTO {
+    'data'?: Array<QuestDTO>;
+    'message'?: string;
+    'statusCode'?: number;
+}
+export interface ApiResponseBodyQuestDTO {
+    'data'?: QuestDTO;
+    'message'?: string;
+    'statusCode'?: number;
+}
+export interface CreateQuestRequest {
+    'title'?: string;
+    'description'?: string;
+    'type'?: string;
+    'actionType'?: CreateQuestRequestActionTypeEnum;
+    'answerHint'?: string;
+    'reward'?: RewardDto;
+}
+
+export const CreateQuestRequestActionTypeEnum = {
+    Unknown: 'unknown',
+    InputText: 'input_text',
+    Quiz: 'quiz',
+    FileSubmission: 'file_submission',
+    VoiceRecord: 'voice_record'
+} as const;
+
+export type CreateQuestRequestActionTypeEnum = typeof CreateQuestRequestActionTypeEnum[keyof typeof CreateQuestRequestActionTypeEnum];
+
 export interface DataListQuestDTO {
     'total'?: number;
     'data'?: Array<QuestDTO>;
@@ -59,22 +88,29 @@ export interface QuestDTO {
     'id'?: string;
     'title'?: string;
     'description'?: string;
-    'type'?: QuestDTOTypeEnum;
+    'type'?: string;
     'actionType'?: QuestDTOActionTypeEnum;
     'answerHint'?: string;
+    'reward'?: RewardDto;
 }
 
-export const QuestDTOTypeEnum = {
-    Knowledge: 'KNOWLEDGE'
-} as const;
-
-export type QuestDTOTypeEnum = typeof QuestDTOTypeEnum[keyof typeof QuestDTOTypeEnum];
 export const QuestDTOActionTypeEnum = {
-    InputText: 'input_text'
+    Unknown: 'unknown',
+    InputText: 'input_text',
+    Quiz: 'quiz',
+    FileSubmission: 'file_submission',
+    VoiceRecord: 'voice_record'
 } as const;
 
 export type QuestDTOActionTypeEnum = typeof QuestDTOActionTypeEnum[keyof typeof QuestDTOActionTypeEnum];
 
+export interface RewardDto {
+    'gold'?: number;
+    'exp'?: number;
+}
+export interface SuggestQuestRequest {
+    'prompt'?: string;
+}
 
 /**
  * QuestControllerApi - axios parameter creator
@@ -122,6 +158,75 @@ export const QuestControllerApiAxiosParamCreator = function (configuration?: Con
         },
         /**
          * 
+         * @summary Create Quest
+         * @param {CreateQuestRequest} createQuestRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createQuest: async (createQuestRequest: CreateQuestRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createQuestRequest' is not null or undefined
+            assertParamExists('createQuest', 'createQuestRequest', createQuestRequest)
+            const localVarPath = `/api/v1/quest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createQuestRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Delete Quest
+         * @param {string} questId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteQuest: async (questId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'questId' is not null or undefined
+            assertParamExists('deleteQuest', 'questId', questId)
+            const localVarPath = `/api/v1/quest/{questId}`
+                .replace(`{${"questId"}}`, encodeURIComponent(String(questId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get Quest List
          * @param {GetQuestListRequest} getQuestListRequest 
          * @param {*} [options] Override http request option.
@@ -155,6 +260,41 @@ export const QuestControllerApiAxiosParamCreator = function (configuration?: Con
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Suggest Quests
+         * @param {SuggestQuestRequest} suggestQuestRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        suggestQuest: async (suggestQuestRequest: SuggestQuestRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'suggestQuestRequest' is not null or undefined
+            assertParamExists('suggestQuest', 'suggestQuestRequest', suggestQuestRequest)
+            const localVarPath = `/api/v1/quest/suggest`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+            localVarHeaderParameter['Accept'] = '*/*';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(suggestQuestRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -180,6 +320,32 @@ export const QuestControllerApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Create Quest
+         * @param {CreateQuestRequest} createQuestRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createQuest(createQuestRequest: CreateQuestRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBodyQuestDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createQuest(createQuestRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['QuestControllerApi.createQuest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Delete Quest
+         * @param {string} questId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteQuest(questId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBodyGradingResult>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteQuest(questId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['QuestControllerApi.deleteQuest']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get Quest List
          * @param {GetQuestListRequest} getQuestListRequest 
          * @param {*} [options] Override http request option.
@@ -189,6 +355,19 @@ export const QuestControllerApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getQuestList(getQuestListRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['QuestControllerApi.getQuestList']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Suggest Quests
+         * @param {SuggestQuestRequest} suggestQuestRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async suggestQuest(suggestQuestRequest: SuggestQuestRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ApiResponseBodyListQuestDTO>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.suggestQuest(suggestQuestRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['QuestControllerApi.suggestQuest']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
     }
@@ -213,6 +392,26 @@ export const QuestControllerApiFactory = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Create Quest
+         * @param {CreateQuestRequest} createQuestRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createQuest(createQuestRequest: CreateQuestRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBodyQuestDTO> {
+            return localVarFp.createQuest(createQuestRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Delete Quest
+         * @param {string} questId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteQuest(questId: string, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBodyGradingResult> {
+            return localVarFp.deleteQuest(questId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get Quest List
          * @param {GetQuestListRequest} getQuestListRequest 
          * @param {*} [options] Override http request option.
@@ -220,6 +419,16 @@ export const QuestControllerApiFactory = function (configuration?: Configuration
          */
         getQuestList(getQuestListRequest: GetQuestListRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBodyDataListQuestDTO> {
             return localVarFp.getQuestList(getQuestListRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Suggest Quests
+         * @param {SuggestQuestRequest} suggestQuestRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        suggestQuest(suggestQuestRequest: SuggestQuestRequest, options?: RawAxiosRequestConfig): AxiosPromise<ApiResponseBodyListQuestDTO> {
+            return localVarFp.suggestQuest(suggestQuestRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -242,6 +451,28 @@ export class QuestControllerApi extends BaseAPI {
 
     /**
      * 
+     * @summary Create Quest
+     * @param {CreateQuestRequest} createQuestRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public createQuest(createQuestRequest: CreateQuestRequest, options?: RawAxiosRequestConfig) {
+        return QuestControllerApiFp(this.configuration).createQuest(createQuestRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Delete Quest
+     * @param {string} questId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public deleteQuest(questId: string, options?: RawAxiosRequestConfig) {
+        return QuestControllerApiFp(this.configuration).deleteQuest(questId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get Quest List
      * @param {GetQuestListRequest} getQuestListRequest 
      * @param {*} [options] Override http request option.
@@ -249,6 +480,17 @@ export class QuestControllerApi extends BaseAPI {
      */
     public getQuestList(getQuestListRequest: GetQuestListRequest, options?: RawAxiosRequestConfig) {
         return QuestControllerApiFp(this.configuration).getQuestList(getQuestListRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Suggest Quests
+     * @param {SuggestQuestRequest} suggestQuestRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public suggestQuest(suggestQuestRequest: SuggestQuestRequest, options?: RawAxiosRequestConfig) {
+        return QuestControllerApiFp(this.configuration).suggestQuest(suggestQuestRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

@@ -1,5 +1,3 @@
-
-
 ## 🚀 Features
 
 - **Feature 1**: Description of a key capability.
@@ -23,24 +21,26 @@
 ### Create Project step
 
 1. Create a new project:
-    ```npm create vite@latest grimoire-app -- --template react-ts```
+   `npm create vite@latest grimoire-app -- --template react-ts`
 
 2. Add tailwind from this doc: https://tailwindcss.com/docs/installation/using-vite
 
 3. Add UI library from this doc: https://ui.shadcn.com/docs/installation/vite
 
 4. Add react-router-dom:
-    ```npm install react-router-dom```
+   `npm install react-router-dom`
 
 ### Installation
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/username/project-name.git
    cd project-name
    ```
 
 2. Install dependencies:
+
    ```bash
    npm install
    ```
