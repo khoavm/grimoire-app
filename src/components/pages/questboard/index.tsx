@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Search } from 'lucide-react'
-import SubmissionModal from '@/components/pages/quest/SubmissionModal.tsx'
-import QuestCard from '@/components/pages/quest/QuestCard.tsx'
+import SubmissionModal from '@/components/pages/questboard/SubmissionModal.tsx'
+import QuestCard from '@/components/pages/questboard/QuestCard.tsx'
 import { useQuery } from '@tanstack/react-query'
-import { type GetQuestListRequest, type QuestDTO } from '@/api/grimoire_svc'
-import { questApi } from '@/lib/api.ts'
-import { CreateQuestDialog } from '@/components/pages/quest/CreateQuestDialog.tsx'
+import {
+  type GetQuestListRequest,
+  type QuestDTO,
+} from '@/lib/api/grimoire_svc/api.ts'
+import { questApi } from '@/lib/api/api.ts'
+import { CreateQuestDialog } from '@/components/pages/questboard/CreateQuestDialog.tsx'
 
-export default function QuestBoard() {
+export default function Index() {
   const [selectedQuest, setSelectedQuest] = useState<QuestDTO | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
 
@@ -52,7 +55,7 @@ export default function QuestBoard() {
   const getReward = (quest: QuestDTO) => {
     let rs = ''
     if (quest.reward.gold) {
-      rs += `${quest.reward.gold} Xu + `
+      rs += `${quest.reward.gold} Gold + `
     }
     if (quest.reward.exp) {
       rs += `${quest.reward.exp} EXP`

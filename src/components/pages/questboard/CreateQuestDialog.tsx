@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useForm } from '@tanstack/react-form'
+import { useForm } from 'react-hook-form'
 import {
   CheckCircle2,
   Coins,
@@ -10,7 +10,7 @@ import {
   Sparkles,
   Tag,
   Trophy,
-  Activity, // Icon for Action Type
+  Activity,
 } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import {
@@ -32,16 +32,26 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select' // Import Select components
-import { questApi } from '@/lib/api'
+} from '@/components/ui/Select.tsx'
+import { questApi } from '@/lib/api/api.ts'
 import {
   type QuestDTO,
   type CreateQuestRequest,
   type CreateQuestRequestActionTypeEnum,
-} from '@/api/grimoire_svc'
+} from '@/lib/api/grimoire_svc'
 
 interface CreateQuestDialogProps {
   onQuestCreated: () => void
+}
+
+interface QuestFormValues {
+  title: string
+  description: string
+  type: string
+  actionType: CreateQuestRequestActionTypeEnum
+  rewardGold: number
+  rewardExp: number
+  answerHint: string
 }
 
 export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
@@ -60,7 +70,7 @@ export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
       onQuestCreated()
     },
     onError: (error) => {
-      console.error('Failed to create quest:', error)
+      console.error('Failed to create questboard:', error)
     },
   })
 
@@ -74,36 +84,46 @@ export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
   })
 
   // -------------------------------------------------------------------------
-  // TANSTACK FORM (Manual Mode)
+  // REACT HOOK FORM
   // -------------------------------------------------------------------------
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<QuestFormValues>({
     defaultValues: {
       title: '',
       description: '',
       type: 'General',
-      actionType: 'input_text' as CreateQuestRequestActionTypeEnum, // Default action type
+      actionType: 'input_text' as CreateQuestRequestActionTypeEnum,
       rewardGold: 10,
       rewardExp: 50,
       answerHint: '',
     },
-    onSubmit: async ({ value }) => {
-      const payload: CreateQuestRequest = {
-        title: value.title,
-        description: value.description,
-        type: value.type,
-        actionType: value.actionType, // Use selected action type
-        answerHint: value.answerHint,
-        reward: {
-          gold: Number(value.rewardGold),
-          exp: Number(value.rewardExp),
-        },
-      }
-
-      await createQuestMutation.mutateAsync(payload)
-      form.reset()
-      setOpen(false)
-    },
   })
+
+  const actionTypeValue = watch('actionType')
+
+  const onSubmit = async (values: QuestFormValues) => {
+    const payload: CreateQuestRequest = {
+      title: values.title,
+      description: values.description,
+      type: values.type,
+      actionType: values.actionType,
+      answerHint: values.answerHint,
+      reward: {
+        gold: Number(values.rewardGold),
+        exp: Number(values.rewardExp),
+      },
+    }
+
+    await createQuestMutation.mutateAsync(payload)
+    reset()
+    setOpen(false)
+  }
 
   // -------------------------------------------------------------------------
   // AI MODE STATE
@@ -134,7 +154,6 @@ export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
     } catch (e) {
       console.log(e)
       throw e
-      // Error handled by mutation onError
     }
   }
 
@@ -146,7 +165,7 @@ export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
         setPrompt('')
         suggestMutation.reset()
         setAddedIndices(new Set())
-        form.reset()
+        reset()
       }, 300)
     }
   }
@@ -186,7 +205,6 @@ export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
             value="ai"
             className="flex-1 flex flex-col overflow-hidden"
           >
-            {/* ... (AI Content remains the same) ... */}
             {step === 'prompt' ? (
               <div className="flex flex-col space-y-4 h-full">
                 <Textarea
@@ -270,183 +288,119 @@ export function CreateQuestDialog({ onQuestCreated }: CreateQuestDialogProps) {
           {/* --- TAB 2: MANUAL MODE --- */}
           <TabsContent value="manual" className="flex-1 flex flex-col">
             <form
-              onSubmit={(e) => {
-                e.preventDefault()
-                e.stopPropagation()
-                form.handleSubmit()
-              }}
+              onSubmit={handleSubmit(onSubmit)}
               className="space-y-4 flex-1"
             >
               {/* Title Field */}
-              <form.Field
-                name="title"
-                validators={{
-                  onChange: ({ value }) =>
-                    !value ? 'Title is required' : undefined,
-                }}
-              >
-                {(field) => (
-                  <div className="grid gap-2">
-                    <Label htmlFor="title">
-                      Title <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
-                      id="title"
-                      placeholder="Quest Title"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <span className="text-xs text-red-500">
-                        {field.state.meta.errors.join(', ')}
-                      </span>
-                    )}
-                  </div>
+              <div className="grid gap-2">
+                <Label htmlFor="title">
+                  Title <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="title"
+                  placeholder="Quest Title"
+                  {...register('title', { required: 'Title is required' })}
+                />
+                {errors.title && (
+                  <span className="text-xs text-red-500">
+                    {errors.title.message}
+                  </span>
                 )}
-              </form.Field>
+              </div>
 
               {/* Type and Action Type Row */}
               <div className="grid grid-cols-2 gap-4">
                 {/* Custom Category Type */}
-                <form.Field name="type">
-                  {(field) => (
-                    <div className="grid gap-2">
-                      <Label className="flex items-center gap-1">
-                        <Tag size={14} /> Type
-                      </Label>
-                      <Input
-                        placeholder="e.g. Daily"
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                      />
-                    </div>
-                  )}
-                </form.Field>
+                <div className="grid gap-2">
+                  <Label className="flex items-center gap-1">
+                    <Tag size={14} /> Type
+                  </Label>
+                  <Input placeholder="e.g. Daily" {...register('type')} />
+                </div>
 
-                {/* NEW: Action Type Selector */}
-                <form.Field name="actionType">
-                  {(field) => (
-                    <div className="grid gap-2">
-                      <Label className="flex items-center gap-1">
-                        <Activity size={14} /> Action
-                      </Label>
-                      <Select
-                        value={field.state.value}
-                        onValueChange={(
-                          val: CreateQuestRequestActionTypeEnum
-                        ) => field.handleChange(val)}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Action" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="input_text">
-                            Text Answer
-                          </SelectItem>
-                          <SelectItem value="quiz">Quiz</SelectItem>
-                          <SelectItem value="file_submission">
-                            File Upload
-                          </SelectItem>
-                          <SelectItem value="voice_record">
-                            Voice Record
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                </form.Field>
+                {/* Action Type Selector */}
+                <div className="grid gap-2">
+                  <Label className="flex items-center gap-1">
+                    <Activity size={14} /> Action
+                  </Label>
+                  <Select
+                    value={actionTypeValue}
+                    onValueChange={(val: CreateQuestRequestActionTypeEnum) =>
+                      setValue('actionType', val)
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Action" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="input_text">Text Answer</SelectItem>
+                      <SelectItem value="quiz">Quiz</SelectItem>
+                      <SelectItem value="file_submission">
+                        File Upload
+                      </SelectItem>
+                      <SelectItem value="voice_record">Voice Record</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* Reward Row */}
               <div className="grid grid-cols-2 gap-4">
-                <form.Field name="rewardGold">
-                  {(field) => (
-                    <div className="grid gap-2">
-                      <Label className="flex items-center gap-1">
-                        <Coins size={14} /> Gold
-                      </Label>
-                      <Input
-                        type="number"
-                        placeholder="10"
-                        value={field.state.value}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
-                      />
-                    </div>
-                  )}
-                </form.Field>
-                <form.Field name="rewardExp">
-                  {(field) => (
-                    <div className="grid gap-2">
-                      <Label className="flex items-center gap-1">
-                        <Trophy size={14} /> Exp
-                      </Label>
-                      <Input
-                        type="number"
-                        placeholder="50"
-                        value={field.state.value}
-                        onChange={(e) =>
-                          field.handleChange(Number(e.target.value))
-                        }
-                      />
-                    </div>
-                  )}
-                </form.Field>
+                <div className="grid gap-2">
+                  <Label className="flex items-center gap-1">
+                    <Coins size={14} /> Gold
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="10"
+                    {...register('rewardGold', { valueAsNumber: true })}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label className="flex items-center gap-1">
+                    <Trophy size={14} /> Exp
+                  </Label>
+                  <Input
+                    type="number"
+                    placeholder="50"
+                    {...register('rewardExp', { valueAsNumber: true })}
+                  />
+                </div>
               </div>
 
               {/* Description Field */}
-              <form.Field name="description">
-                {(field) => (
-                  <div className="grid gap-2">
-                    <Label htmlFor="desc">Description</Label>
-                    <Textarea
-                      id="desc"
-                      placeholder="Detailed instructions..."
-                      className="min-h-25"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </div>
-                )}
-              </form.Field>
+              <div className="grid gap-2">
+                <Label htmlFor="desc">Description</Label>
+                <Textarea
+                  id="desc"
+                  placeholder="Detailed instructions..."
+                  className="min-h-25"
+                  {...register('description')}
+                />
+              </div>
 
               {/* Answer Hint Field */}
-              <form.Field name="answerHint">
-                {(field) => (
-                  <div className="grid gap-2">
-                    <Label htmlFor="answerHint">Example Answer / Hint</Label>
-                    <Textarea
-                      id="answerHint"
-                      placeholder="e.g. Expected format or keywords..."
-                      className="min-h-15 text-sm font-mono"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                  </div>
-                )}
-              </form.Field>
+              <div className="grid gap-2">
+                <Label htmlFor="answerHint">Example Answer / Hint</Label>
+                <Textarea
+                  id="answerHint"
+                  placeholder="e.g. Expected format or keywords..."
+                  className="min-h-15 text-sm font-mono"
+                  {...register('answerHint')}
+                />
+              </div>
 
               <div className="flex justify-end pt-4">
-                <form.Subscribe
-                  selector={(state) => [state.canSubmit, state.isSubmitting]}
-                  children={([canSubmit, isSubmitting]) => (
-                    <Button
-                      type="submit"
-                      disabled={
-                        !canSubmit ||
-                        isSubmitting ||
-                        createQuestMutation.isPending
-                      }
-                    >
-                      {isSubmitting || createQuestMutation.isPending ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
-                      ) : (
-                        'Create Quest'
-                      )}
-                    </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || createQuestMutation.isPending}
+                >
+                  {isSubmitting || createQuestMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Create Quest'
                   )}
-                />
+                </Button>
               </div>
             </form>
           </TabsContent>

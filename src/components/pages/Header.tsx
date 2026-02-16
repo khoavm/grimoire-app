@@ -7,35 +7,30 @@ import {
 } from 'react'
 import avatarImg from '../../assets/icon/avatar.jpg'
 import { Coins, Expand, LogOut, Shrink, UserIcon } from 'lucide-react'
+import { useAuth } from '@/context/AuthContext.tsx'
 
-// -----------------------------------------------------------------------------
-// TYPES
-// -----------------------------------------------------------------------------
+export function UserHUD() {
+  const { user } = useAuth()
 
-interface UserHUDProps {
-  level: number
-  gold: number
-  currentExp: number
-  maxExp: number
-}
-
-export function UserHUD({ level, gold, currentExp, maxExp }: UserHUDProps) {
-  const expPercentage = Math.min(100, Math.max(0, (currentExp / maxExp) * 100))
+  const expPercentage = Math.min(
+    100,
+    Math.max(0, (user.currentExp / user.nextExp) * 100)
+  )
 
   return (
     <div className="flex items-center gap-4 mr-4 border-r border-gray-200 pr-4 h-8">
       {/* Gold Display */}
       <div className="flex items-center gap-1.5 text-amber-600 font-semibold text-sm bg-amber-50 px-2 py-1 rounded-full border border-amber-100">
         <Coins className="w-3.5 h-3.5 fill-current" />
-        <span>{gold.toLocaleString()}</span>
+        <span>{user.gold.toLocaleString()}</span>
       </div>
 
       {/* Level & XP Container */}
       <div className="flex flex-col items-end justify-center w-32">
         <div className="flex items-center gap-1 text-xs font-bold text-indigo-700 leading-none mb-1">
-          <span>Lv.{level}</span>
+          <span>Lv.{user.level}</span>
           <span className="text-gray-400 font-normal">
-            ({currentExp}/{maxExp})
+            ({user.currentExp}/{user.nextExp})
           </span>
         </div>
 
@@ -55,15 +50,18 @@ export function UserHUD({ level, gold, currentExp, maxExp }: UserHUDProps) {
 // COMPONENT: Profile Toggle Menu (The Dropdown)
 // -----------------------------------------------------------------------------
 function ProfileToggleMenu({ isMenuOpen }: { isMenuOpen: boolean }) {
+  const { logout } = useAuth()
   if (!isMenuOpen) return null
-
   return (
     <div className="absolute right-0 top-full mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg z-50 py-1">
-      <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left">
+      <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left cursor-pointer">
         <UserIcon className="w-4 h-4" /> Profile Settings
       </button>
       <div className="h-px bg-gray-100 my-1" />
-      <button className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left">
+      <button
+        className="w-full cursor-pointer flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors text-left"
+        onClick={logout}
+      >
         <LogOut className="w-4 h-4" /> Đăng xuất
       </button>
     </div>
@@ -101,12 +99,7 @@ function HeaderProfileSection() {
   return (
     <div className="flex items-center">
       {/* 1. The Stats HUD (Always Visible) */}
-      <UserHUD
-        level={user.level}
-        gold={user.gold}
-        currentExp={user.currentExp}
-        maxExp={user.maxExp}
-      />
+      <UserHUD />
 
       {/* 2. The Profile Dropdown */}
       <div className="relative" ref={menuRef}>
@@ -138,8 +131,9 @@ function Header({
   setIsExpand: Dispatch<SetStateAction<boolean>>
   currentMenu: string
 }) {
+  const { isAuthenticated } = useAuth()
   return (
-    <header className="flex flex-1 h-1 pt-2 pb-2 items-center justify-between bg-white px-6">
+    <header className="flex  h-19 pt-2 pb-2 items-center justify-between bg-white px-6">
       <div className="flex items-center justify-center gap-2 text-xl text-gray-700">
         <div
           className="cursor-pointer font-bold"
@@ -150,7 +144,7 @@ function Header({
         <span>{currentMenu}</span>
       </div>
       <div className="flex flex-row-reverse">
-        <HeaderProfileSection />
+        {isAuthenticated && <HeaderProfileSection />}
       </div>
     </header>
   )

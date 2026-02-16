@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { QuestDTOActionTypeEnum } from '@/api/grimoire_svc'
-import { questApi } from '@/lib/api.ts'
+import { QuestDTOActionTypeEnum } from '@/lib/api/grimoire_svc'
+import { questApi } from '@/lib/api/api.ts'
 
 // --- 2. Interface Update ---
 interface QuestCardProps {
@@ -30,14 +30,14 @@ const QuestCard: React.FC<QuestCardProps> = ({
   const deleteMutation = useMutation({
     mutationFn: (questId: string) => questApi.deleteQuest(questId),
     onSuccess: () => {
-      // Refresh the quest list after successful delete
+      // Refresh the questboard list after successful delete
       queryClient.invalidateQueries({ queryKey: ['quests'] })
       // Close menu
       setIsMenuOpen(false)
     },
     onError: (error) => {
-      console.error('Failed to delete quest:', error)
-      alert('Failed to delete quest')
+      console.error('Failed to delete questboard:', error)
+      alert('Failed to delete questboard')
     },
   })
 
@@ -54,7 +54,7 @@ const QuestCard: React.FC<QuestCardProps> = ({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation() // Prevent triggering the card's onClick
-    if (confirm('Are you sure you want to delete this quest?')) {
+    if (confirm('Are you sure you want to delete this questboard?')) {
       deleteMutation.mutate(id)
     }
   }

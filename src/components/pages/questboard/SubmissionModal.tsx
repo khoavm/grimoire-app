@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
-import type { AnswerQuestRequest, QuestDTO } from '@/api/grimoire_svc'
+import type { AnswerQuestRequest, QuestDTO } from '@/lib/api/grimoire_svc'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { questApi } from '@/lib/api.ts'
+import { questApi, authApi } from '@/lib/api/api.ts'
+import { useAuth } from '@/context/AuthContext.tsx'
 
 interface SubmissionModalProps {
   quest: QuestDTO
@@ -16,6 +17,7 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
 }) => {
   const [answer, setAnswer] = useState('')
   const queryClient = useQueryClient()
+  const { updateUser } = useAuth()
 
   // 1. Setup the Mutation
   const mutation = useMutation({
@@ -28,12 +30,14 @@ const SubmissionModal: React.FC<SubmissionModalProps> = ({
         questionDescription: quest.description || '',
       }
 
-      // This matches POST /api/v1/quest/{questId}/answer
+      // This matches POST /api/v1/questboard/{questId}/answer
       return questApi.answerQuest(quest.id, requestBody)
     },
     onSuccess: async () => {
-      // Optional: Refresh the quest list to show this quest as "Completed"
+      // Optional: Refresh the questboard list to show this questboard as "Completed"
       await queryClient.invalidateQueries({ queryKey: ['quests'] })
+      const { data } = await authApi.getMyInfo()
+      updateUser(data.data)
     },
     onError: (error) => {
       console.error('Submission failed', error)

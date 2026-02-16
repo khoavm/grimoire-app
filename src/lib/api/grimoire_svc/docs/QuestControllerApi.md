@@ -49,7 +49,7 @@ const { status, data } = await apiInstance.answerQuest(
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 
@@ -100,7 +100,7 @@ const { status, data } = await apiInstance.createQuest(
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 
@@ -150,7 +150,7 @@ const { status, data } = await apiInstance.deleteQuest(
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 
@@ -201,7 +201,7 @@ const { status, data } = await apiInstance.getQuestList(
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 
@@ -252,7 +252,7 @@ const { status, data } = await apiInstance.suggestQuest(
 
 ### Authorization
 
-No authorization required
+[bearerAuth](../README.md#bearerAuth)
 
 ### HTTP request headers
 

@@ -4,6 +4,7 @@
   "servers": [
     { "url": "http://localhost:8080", "description": "Generated server url" }
   ],
+  "security": [{ "bearerAuth": [] }],
   "paths": {
     "/api/v1/quest": {
       "post": {
@@ -121,6 +122,68 @@
         }
       }
     },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": ["Auth Controller"],
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/OauthLoginRequest" }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyLoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "get": {
+        "tags": ["Auth Controller"],
+        "operationId": "refresh",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyLoginResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": ["Auth Controller"],
+        "operationId": "getMyInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponseBodyUserDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/quest/{questId}": {
       "delete": {
         "tags": ["Quest Controller"],
@@ -168,7 +231,16 @@
             ]
           },
           "answerHint": { "type": "string" },
-          "reward": { "$ref": "#/components/schemas/RewardDto" }
+          "reward": { "$ref": "#/components/schemas/RewardDto" },
+          "quizContent": { "$ref": "#/components/schemas/QuizContentDTO" }
+        }
+      },
+      "QuizContentDTO": {
+        "type": "object",
+        "properties": {
+          "options": { "type": "array", "items": { "type": "string" } },
+          "correctAnswer": { "type": "string" },
+          "explanation": { "type": "string" }
         }
       },
       "RewardDto": {
@@ -204,7 +276,8 @@
             ]
           },
           "answerHint": { "type": "string" },
-          "reward": { "$ref": "#/components/schemas/RewardDto" }
+          "reward": { "$ref": "#/components/schemas/RewardDto" },
+          "quizContent": { "$ref": "#/components/schemas/QuizContentDTO" }
         }
       },
       "AnswerQuestRequest": {
@@ -274,6 +347,61 @@
           "page": { "type": "integer", "format": "int32" },
           "size": { "type": "integer", "format": "int32" }
         }
+      },
+      "OauthLoginRequest": {
+        "type": "object",
+        "properties": {
+          "authProvider": { "type": "string", "enum": ["GOOGLE"] },
+          "token": { "type": "string" }
+        }
+      },
+      "ApiResponseBodyLoginResponse": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/LoginResponse" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer", "format": "int32" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": {
+          "token": { "type": "string" },
+          "refreshToken": { "type": "string" },
+          "user": { "$ref": "#/components/schemas/UserDto" }
+        }
+      },
+      "UserDto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "displayName": { "type": "string" },
+          "fullName": { "type": "string" },
+          "gold": { "type": "integer", "format": "int64" },
+          "level": { "type": "integer", "format": "int32" },
+          "currentExp": { "type": "integer", "format": "int64" },
+          "nextExp": { "type": "integer", "format": "int64" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "provider": { "type": "string" }
+        }
+      },
+      "ApiResponseBodyUserDto": {
+        "type": "object",
+        "properties": {
+          "data": { "$ref": "#/components/schemas/UserDto" },
+          "message": { "type": "string" },
+          "statusCode": { "type": "integer", "format": "int32" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
       }
     }
   }
